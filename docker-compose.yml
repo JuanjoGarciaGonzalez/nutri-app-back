@@ -1,11 +1,12 @@
 version: '3'
 
 services:
+  # Servicio del backend (API)
   api-web:
     build: .
     container_name: nutri-app-api
     ports:
-      - "8080:80"
+      - "8080:80" # Cambiado el puerto del host a 8080
     depends_on:
       - database
     environment:
@@ -13,6 +14,7 @@ services:
     networks:
       - nutri-network
 
+  # Servicio de la base de datos
   database:
     image: mysql:8
     container_name: nutri-app-db
@@ -28,8 +30,36 @@ services:
     networks:
       - nutri-network
 
+  # Servicio del frontend (Vite + React)
+  front-web:
+    build:
+      context: ./../nutri-app-front # Ruta relativa al directorio donde se encuentra el Dockerfile del frontend
+    container_name: nutri-app-front
+    ports:
+      - "80:80" # El frontend ahora expone el puerto 80
+    networks:
+      - nutri-network
+
+###> doctrine/doctrine-bundle ###
+  database:
+    image: postgres:${POSTGRES_VERSION:-16}-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      # You should definitely change the password in production
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
+      # - ./docker/db/data:/var/lib/postgresql/data:rw
+###< doctrine/doctrine-bundle ###
+
 networks:
   nutri-network:
 
 volumes:
   db_data:
+
+###> doctrine/doctrine-bundle ###
+  database_data:
+###< doctrine/doctrine-bundle ###
