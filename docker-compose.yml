@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  api-web:
+    build: .
+    container_name: nutri-app-api
+    ports:
+      - "8080:80"
+    depends_on:
+      - database
+    environment:
+      DATABASE_URL: "mysql://nutriuser:nutripass2024*@database:3306/nutri-app"
+    networks:
+      - nutri-network
+
+  database:
+    image: mysql:8
+    container_name: nutri-app-db
+    environment:
+      MYSQL_DATABASE: nutri-app
+      MYSQL_USER: nutriuser
+      MYSQL_PASSWORD: nutripass2024*
+      MYSQL_ROOT_PASSWORD: nutripass2024*
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - nutri-network
+
+networks:
+  nutri-network:
+
+volumes:
+  db_data:
